@@ -1,0 +1,39 @@
+How to use ansible failed_when Statement
+Example 1:  System Requirement / Prerequisite check before Installation
+This one is a more real-time scenario every one of us might have come across, During the installation of software, in midway, the installation wizard will fail stating that there is no enough memory (or) the minimum system requirements to install that specific software is not met
+
+As we all know, Every Software needs some minimum system requirements. When they are not met, The installation would fail.
+
+In our case, We are going to take weblogic application server installation as an example.
+
+As per oracle recommendation for weblogic 12c to function properly and for hassle-free installation, The system must meet the following requirement
+
+2 GB of Physical Memory ( RAM)
+Minimum 4 GB of Disk space in Domain Directory /opt
+Minimum 1 GB of disk space in /tmp directory
+Now we are going to perform a quick pre-requisite check using ansible failed_when and determine whether the system requirement specified above are met
+
+Consider the following playbook
+
+---
+- hosts: app
+  tasks:
+  - name: Making sure the /tmp has more than 1gb
+    shell: "df -h /tmp|grep -v Filesystem|awk '{print $4}'|cut -d G -f1"
+    register: tmpspace
+    failed_when: "tmpspace.stdout|float < 1"
+
+  - name: Making sure the /opt has more than 4gb
+    shell: "df -h /opt|grep -v Filesystem|awk '{print $4}'|cut -d G -f1"
+    register: tmpspace
+    failed_when: "tmpspace.stdout|float < 4"
+
+  - name: Making sure the Physical Memory more than 2gb
+    shell: "cat /proc/meminfo|grep -i memtotal|awk '{print $2/1024/1024}'"
+    register: memory
+    failed_when: "memory.stdout|float < 2"
+ 
+
+The playbook has been created exactly to validate if the system is meeting the oracle recommended System Requirements.
+
+The tasks are programmed to fail when they are not meeting the requirements. This is done using failed_when and a simple math.

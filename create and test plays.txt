@@ -1,0 +1,40 @@
+Create an inventory
+====================
+echo "[group1]" > myhosts
+
+Then add the host to the group:
+
+echo "host01 ansible_ssh_user=ubuntu" >> myhosts
+
+===========================================================
+
+---
+- hosts: host01
+  become: true
+  tasks:
+  - name: ensure latest sysstat is installed
+    apt:
+      name: sysstat
+      state: latest
+
+ansible-playbook -i myhosts site.yml
+===================================
+---
+- hosts: host01
+  become: true
+  tasks:
+  - name: ensure sysstat is installed at version 10.2.0-1
+    apt:
+      name: sysstat=10.2.0-1
+      state: installed
+
+Then re-run  the playbook:
+
+ansible-playbook -i myhosts site.yml
+
+===================================
+sed -i -e 's/state: latest/state: absent/' -e 's/ensure.*/ensure sysstat is removed/' site.yml
+
+Then re-run  the playbook:
+
+ansible-playbook -i myhosts site.yml
