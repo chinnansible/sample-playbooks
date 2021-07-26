@@ -1,0 +1,11 @@
+---
+# this play book is to restart httpd service
+- hosts: all
+  tasks
+  - name: restart httpd service
+    service:
+      name: httpd
+      state: restarted
+      enabled: true
+    become: true
+      
